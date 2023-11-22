@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qzk.dao.TeachersMapper">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.Teachers">
+    <result column="teacher_id" jdbcType="INTEGER" property="teacher_id" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacher_name" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="phoneNumber" jdbcType="VARCHAR" property="phoneNumber" />
+    <result column="expertise" jdbcType="VARCHAR" property="expertise" />
+  </resultMap>
+  <insert id="insert" parameterType="com.qzk.pojo.Teachers">
+    insert into teachers (teacher_id, teacher_name, email, 
+      phoneNumber, expertise)
+    values (#{teacher_id,jdbcType=INTEGER}, #{teacher_name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{phoneNumber,jdbcType=VARCHAR}, #{expertise,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select teacher_id, teacher_name, email, phoneNumber, expertise
+    from teachers
+  </select>
+</mapper>

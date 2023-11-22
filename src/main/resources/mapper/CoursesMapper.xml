@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qzk.dao.CoursesMapper">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.Courses">
+    <id column="course_ID" property="course_ID" />
+    <result column="course_name"  property="course_name" />
+    <result column="course_description" property="course_description" />
+    <result column="course_content" property="course_content" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from courses
+    where course_ID = #{course_ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qzk.pojo.Courses">
+    insert into courses (course_ID, course_name, course_description,
+      course_content)
+    values (#{course_ID,jdbcType=INTEGER}, #{course_name,jdbcType=VARCHAR  }, #{course_description,jdbcType=VARCHAR},
+      #{course_content,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qzk.pojo.Courses">
+    update courses
+    set course_name = #{course_name,jdbcType=VARCHAR  },
+      course_description = #{course_description,jdbcType=VARCHAR  },
+      course_content = #{course_content,jdbcType=VARCHAR   }
+    where course_ID = #{course_ID,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select course_ID, course_name, course_description, course_content
+    from courses
+    where course_ID = #{course_ID,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select course_ID, course_name, course_description, course_content
+    from courses
+  </select>
+</mapper>

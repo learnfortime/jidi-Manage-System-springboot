@@ -1,0 +1,47 @@
+#???
+server:
+  port: 8001
+  servlet:
+    context-path: /
+
+spring:
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/j2e_jidimanagement?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 3832414122.qzk
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false  #关闭thymeleaf缓存
+  main:
+    allow-circular-references: true
+    #redis
+    redis:
+      host: localhost
+      port: 6379
+      database: 5
+      timeout: 50000
+      lettuce:
+        pool:
+        max-active: 8 #????????
+        max-wait: -1 #?????????????????
+        max-idle: 8 #???????
+
+
+#Mybatis??
+mybatis:
+  type-aliases-package: com.qzk.pojo #????
+  mapper-locations: classpath:mapper/*.xml  #????
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#????
+#properties:
+#  spring.mvc.view.prefix=/templates/
+#  spring.mvc.view.suffix=.html
+#

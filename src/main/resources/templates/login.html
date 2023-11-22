@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 300px;
+            padding: 16px;
+            background-color: white;
+            margin: 0 auto;
+            margin-top: 100px;
+            border: 1px solid black;
+            border-radius: 4px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form method="POST" action="./pages/index.html">
+        <label for="user"><b>username</b></label>
+        <input type="text" placeholder="please input admin username" name="user" required>
+
+        <label for="pwd"><b>password</b></label>
+        <input type="password" placeholder="please input admin password" name="pwd" required>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<script>
+    // document.querySelector("button").addEventListener("click", function() {
+    //     alert("Login success！");
+    // });
+    $(document).ready(function() {
+        $("form").on("submit", function(event) {
+            event.preventDefault();
+
+            var formData = {
+                user: $("input[name='user']").val(),
+                pwd: $("input[name='pwd']").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/login",
+                data: JSON.stringify(formData),
+                contentType: "application/json",
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                    // 根据响应处理后续逻辑
+                    alert("Login Success!")
+                    window.location.href='./pages/index.html/';
+                },
+                error: function(error) {
+                    console.log(error);
+                    // 根据错误处理后续逻辑
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

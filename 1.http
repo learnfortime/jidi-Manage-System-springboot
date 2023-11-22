@@ -1,0 +1,28 @@
+###删除
+DELETE http://localhost:8001/student/delete/
+Content-Type: application/json
+{
+   "student_id" : 18
+}
+
+
+###增添
+POST http://localhost:8001/student/insert/
+Content-Type: application/json
+
+{
+  "student_id": 23,
+  "student_name": "ledi",
+  "email": "129521500qq.com",
+  "phoneNumber": 1865453467,
+  "progress" : 122
+}
+
+
+###实现分页查询
+GET http://localhost:8001/student/list?pageNum=1&pageSize=2
+Accept: application/json
+
+###全部查询默认分页数（pageNum=1，pageSize=5）
+GET http://localhost:8001/student/list/
+Accept: application/json

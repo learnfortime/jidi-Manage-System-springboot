@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <classPathEntry
+            location="D:\java\jar\mysql\mysql-connector-java-8.0.28.jar" />
+
+    <context id="default" targetRuntime="MyBatis3Simple">
+        <!-- 去掉生成出来的代码的注解 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+            <property name="suppressDate" value="true" />
+        </commentGenerator>
+        <!-- 数据库连接配置 -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/j2e_jidimanagement?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT"
+                        userId="root"
+                        password="3832414122.qzk"/>
+
+        <!-- 实体类生成配置 -->
+        <javaModelGenerator targetPackage="com.qzk.pojo" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- Mapper的xml文件生成 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!-- interface接口生成 -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="com.qzk.dao"
+                             targetProject="src\main\java">
+        </javaClientGenerator>
+
+        <!-- 表格生成配置 -->
+        <table tableName="Courses">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="Students">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="Teachers">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="CourseSchedules">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="LearningResources">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="OnlineLearning">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="AssignmentSubmissions">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+        <table tableName="GradesAndCertificates">
+            <property name="useActualColumnNames" value="true"/>
+        </table>
+    </context>
+</generatorConfiguration>

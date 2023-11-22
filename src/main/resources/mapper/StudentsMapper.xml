@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qzk.dao.StudentsMapper">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.StudentsExtends">
+    <id column="student_id" property="student_id" />
+    <result column="student_name" property="student_name" />
+    <result column="email" property="email" />
+    <result column="phoneNumber" property="phoneNumber" />
+    <result column="progress" property="progress" />
+
+    <!-- onlinelearning -->
+    <result column="learning_id" property="learning_id" />
+    <result column="course_id" property="course_id" />
+    <result column="video_url" property="video_url" />
+    <result column="quiz_Results" property="quiz_Results" />
+
+    <!-- Assignmentsubmissions -->
+    <result column="submission_id" property="submission_id" />
+    <result column="teacher_id" property="teacher_id" />
+    <result column="assignment_name" property="assignment_name" />
+    <result column="submission_date" property="submission_date" />
+    <result column="grade" property="grade" />
+    <result column="submission_content" property="submission_content" />
+
+    <!-- gradesandcertificates -->
+<!--    <result column="gradeAndCertificateID" property="gradeAndCertificateID" />-->
+<!--    <result column="finalGrade" property="finalGrade" />-->
+<!--    <result column="certificateURL" property="certificateURL" />-->
+      <collection property="gradesAndCertificates" ofType="com.qzk.pojo.Gradesandcertificates">
+          <id column="gradeAndCertificateID" property="gradeAndCertificateID" />
+          <result column="course_id" property="course_id"/>
+          <result column="finalGrade" property="finalGrade" />
+          <result column="certificateURL" property="certificateURL" />
+      </collection>
+  </resultMap>
+  <insert id="insert" parameterType="com.qzk.pojo.Students">
+    insert into students (student_id, student_name, email, 
+      phoneNumber, progress)
+    values (#{student_id,jdbcType=INTEGER}, #{student_name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{phoneNumber,jdbcType=VARCHAR}, #{progress,jdbcType=INTEGER})
+  </insert>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from students
+    where student_id = #{student_id,jdbcType=INTEGER}
+  </delete>
+  <update id="updateByPrimaryKey" parameterType="com.qzk.pojo.Students">
+    UPDATE students
+    SET student_name = #{student_name},
+        email = #{email},
+        phoneNumber = #{phoneNumber},
+        progress = #{progress}
+    WHERE student_id = #{student_id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    SELECT s.student_id, s.student_name, s.email, s.phoneNumber, s.progress,
+           o.learning_id, o.course_id, o.video_url, o.quiz_Results,
+           a.submission_id, a.teacher_id, a.assignment_name, a.submission_date, a.grade, a.submission_content,
+           g.course_id,g.gradeAndCertificateID, g.finalGrade, g.certificateURL
+    FROM students s
+           LEFT JOIN onlinelearning o ON s.student_id = o.student_id
+           LEFT JOIN assignmentsubmissions a ON s.student_id = a.student_id
+           LEFT JOIN gradesandcertificates g ON s.student_id = g.student_id
+    where s.student_id = #{student_id,jdbcType=INTEGER};
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT s.student_id, s.student_name, s.email, s.phoneNumber, s.progress,
+           o.learning_id, o.course_id, o.video_url, o.quiz_Results,
+           a.submission_id, a.teacher_id, a.assignment_name, a.submission_date, a.grade, a.submission_content,
+           g.course_id,g.gradeAndCertificateID, g.finalGrade, g.certificateURL
+    FROM students s
+           LEFT JOIN onlinelearning o ON s.student_id = o.student_id
+           LEFT JOIN assignmentsubmissions a ON s.student_id = a.student_id
+           LEFT JOIN gradesandcertificates g ON s.student_id = g.student_id
+  </select>
+
+</mapper>

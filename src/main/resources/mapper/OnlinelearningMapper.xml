@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qzk.dao.OnlinelearningMapper">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.Onlinelearning">
+    <id column="Learning_id" jdbcType="INTEGER" property="learning_id" />
+    <result column="student_id" jdbcType="INTEGER" property="student_id" />
+    <result column="course_id" jdbcType="INTEGER" property="course_id" />
+    <result column="video_url" jdbcType="VARCHAR" property="video_url" />
+    <result column="quiz_Results" jdbcType="INTEGER" property="quiz_Results" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from onlinelearning
+    where Learning_id = #{learning_id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qzk.pojo.Onlinelearning">
+    insert into onlinelearning (Learning_id, student_id, course_id, 
+      video_url, quiz_Results)
+    values (#{learning_id,jdbcType=INTEGER}, #{student_id,jdbcType=INTEGER}, #{course_id,jdbcType=INTEGER}, 
+      #{video_url,jdbcType=VARCHAR}, #{quiz_Results,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qzk.pojo.Onlinelearning">
+    update onlinelearning
+    set student_id = #{student_id,jdbcType=INTEGER},
+      course_id = #{course_id,jdbcType=INTEGER},
+      video_url = #{video_url,jdbcType=VARCHAR},
+      quiz_Results = #{quiz_Results,jdbcType=INTEGER}
+    where Learning_id = #{learning_id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select Learning_id, student_id, course_id, video_url, quiz_Results
+    from onlinelearning
+    where Learning_id = #{learning_id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select Learning_id, student_id, course_id, video_url, quiz_Results
+    from onlinelearning
+  </select>
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qzk.dao.GradesandcertificatesMapper">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.Gradesandcertificates">
+    <id column="GradeAndCertificateID" jdbcType="INTEGER" property="gradeAndCertificateID" />
+    <result column="student_id" jdbcType="INTEGER" property="student_id" />
+    <result column="course_id" jdbcType="INTEGER" property="course_id" />
+    <result column="FinalGrade" jdbcType="INTEGER" property="finalGrade" />
+    <result column="CertificateURL" jdbcType="VARCHAR" property="certificateURL" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from gradesandcertificates
+    where GradeAndCertificateID = #{gradeAndCertificateID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qzk.pojo.Gradesandcertificates">
+    insert into gradesandcertificates (GradeAndCertificateID, student_id, 
+      course_id, FinalGrade, CertificateURL
+      )
+    values (#{gradeAndCertificateID,jdbcType=INTEGER}, #{student_id,jdbcType=INTEGER}, 
+      #{course_id,jdbcType=INTEGER}, #{finalGrade,jdbcType=INTEGER}, #{certificateURL,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qzk.pojo.Gradesandcertificates">
+    update gradesandcertificates
+    set student_id = #{student_id,jdbcType=INTEGER},
+      course_id = #{course_id,jdbcType=INTEGER},
+      FinalGrade = #{finalGrade,jdbcType=INTEGER},
+      CertificateURL = #{certificateURL,jdbcType=VARCHAR}
+    where GradeAndCertificateID = #{gradeAndCertificateID,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select GradeAndCertificateID, student_id, course_id, FinalGrade, CertificateURL
+    from gradesandcertificates
+    where GradeAndCertificateID = #{gradeAndCertificateID,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select GradeAndCertificateID, student_id, course_id, FinalGrade, CertificateURL
+    from gradesandcertificates
+  </select>
+</mapper>
