@@ -1,91 +1,329 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Admin Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #333;
             margin: 0;
             padding: 0;
+            color: #fff;
         }
-        .container {
+
+        .login-container {
             width: 300px;
-            padding: 16px;
-            background-color: white;
-            margin: 0 auto;
-            margin-top: 100px;
-            border: 1px solid black;
-            border-radius: 4px;
+            margin: 50px auto;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
         }
-        input[type=text], input[type=password] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
+
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
+
+        .tab-header div {
             cursor: pointer;
-            width: 100%;
+            padding: 10px;
+            flex-grow: 1;
+            text-align: center;
         }
-        button:hover {
-            opacity: 0.8;
+
+        .tab-header .active {
+            border-bottom: 2px solid orange;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        .submit-container input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: orange;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .submit-container input:hover {
+            background-color: #e69500;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <form method="POST" action="./pages/index.html">
-        <label for="user"><b>username</b></label>
-        <input type="text" placeholder="please input admin username" name="user" required>
-
-        <label for="pwd"><b>password</b></label>
-        <input type="password" placeholder="please input admin password" name="pwd" required>
-
-        <button type="submit">Login</button>
-    </form>
+    <div class="login-container">
+        <div class="tab-header">
+            <div class="active" onclick="switchTab('admin')">Admin 登录</div>
+            <div onclick="switchTab('student')">Student 登录</div>
+            <div onclick="switchTab('teacher')">Teacher 登录</div>
+        </div>
+        <div class="form-container">
+            <!-- Admin Login Form -->
+            <form id="admin-form" class="login-form">
+                <div class="input-group">
+                    <input type="text" placeholder="please input admin username" name="user" id="name" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="please input admin password" name="pwd" id="password" required>
+                </div>
+                <div class="submit-container">
+                    <input type="button" class ="button" value="确定" onclick="login()">
+                </div>
+            </form>
+            <!-- Student Login Form -->
+            <form id="student-form" class="login-form" style="display: none;">
+                <div class="input-group">
+                    <input type="text" placeholder="请输入学生邮箱" id="email" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="请输入学生密码或电话号码" id="phoneNumber">
+                </div>
+                <div class="submit-container">
+                    <input type="button" class ="button" value="确定" onclick="studentLogin()">
+                </div>
+            </form>
+            <!-- Teacher Login Form -->
+            <form id="teacher-form" class="login-form" style="display: none;">
+                <div class="input-group">
+                    <input type="text" placeholder="请输入教师邮箱" id="teacher_id" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="请输入教师密码" id="teacher_pwd">
+                </div>
+                <div class="submit-container">
+                    <input type="button" class ="button" value="确定" onclick="teacherLogin()">
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
+<!--<script type="text/javascript" src="js/jquery-1.11.1.js" ></script>-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // document.querySelector("button").addEventListener("click", function() {
-    //     alert("Login success！");
-    // });
-    $(document).ready(function() {
-        $("form").on("submit", function(event) {
-            event.preventDefault();
-
-            var formData = {
-                user: $("input[name='user']").val(),
-                pwd: $("input[name='pwd']").val()
-            };
-
-            $.ajax({
-                type: "POST",
-                url: "/login",
-                data: JSON.stringify(formData),
-                contentType: "application/json",
-                dataType: "json",
-                success: function(response) {
-                    console.log(response);
-                    // 根据响应处理后续逻辑
-                    alert("Login Success!")
-                    window.location.href='./pages/index.html/';
-                },
-                error: function(error) {
-                    console.log(error);
-                    // 根据错误处理后续逻辑
+    function login() {
+        // 获取用户名和密码
+        var name = $("#name").val();
+        var password = $("#password").val();
+        $.ajax({
+            url : "auth/login/",
+            type : "post",
+            // data表示发送的数据
+            data : JSON.stringify({
+                user : name,
+                pwd : password
+            }),
+            // 定义发送请求的数据格式为JSON字符串
+            contentType : "application/json",
+            //定义回调响应的数据格式为JSON字符串,该属性可以省略
+            dataType : "text",
+            //成功响应的结果
+            success : function(res) {
+                // var storage=window.localStorage
+                // 将 res 解析为 JSON 对象
+                var responseObject = JSON.parse(res);
+                alert(responseObject.state)
+                if (responseObject.state!=false){
+                    var response = JSON.parse(res);
+                    console.log("res.token:",response.token)
+                    //保存信息到本地，里面都token
+                    localStorage.setItem("token",JSON.stringify(response.token));
+                    console.log(window.localStorage)
+                    takeToenLogin()
+                }else {
+                    alert("密码错误请重新登录")
+                    window.location.reload()
                 }
-            });
-        });
-    });
 
+                },
+            error:function (res) {
+                console.log(res);
+            }
+        });
+    }
+    function studentLogin(){
+        var email = $("#email").val();
+        var phoneNumber = $("#phoneNumber").val();
+        alert(email+phoneNumber)
+        $.ajax({
+            url : "/auth/studentLogin/",
+            type : "post",
+            // data表示发送的数据
+            data : JSON.stringify({
+                email : email,
+                phoneNumber: phoneNumber
+            }),
+            // 定义发送请求的数据格式为JSON字符串
+            contentType : "application/json",
+            //定义回调响应的数据格式为JSON字符串,该属性可以省略
+            dataType : "text",
+            //成功响应的结果
+            success : function(res) {
+                // var storage=window.localStorage
+                // 将 res 解析为 JSON 对象
+                var responseObject = JSON.parse(res);
+                alert(responseObject.state)
+                if (responseObject.state!=false){
+                    var response = JSON.parse(res);
+                    console.log("res.token:",response.token)
+                    //保存信息到本地，里面都token
+                    localStorage.setItem("token",JSON.stringify(response.token));
+                    console.log(window.localStorage)
+                    $.ajax({
+                        url : "/index",
+                        type : "GET",
+                        contentType : "application/json",
+                        beforeSend: function(xhr) {
+                            // 在发送请求之前设置 Authorization 头部
+                            var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+                            xhr.setRequestHeader("Authorization", "Bearer " + token);
+                        },
+                        success : function(response) {
+                            console.log("登录成功")
+                            window.location.href = "./pages/student/index.html";
+                        },
+                        error: function(error) {
+                            // 处理错误
+                            console.log("error:",error)
+                        }
+                    });
+                }else {
+                    alert("密码错误请重新登录")
+                    window.location.reload()
+                }
+
+            },
+            error:function (res) {
+                console.log(res);
+            }
+        });
+    }
+    function teacherLogin(){
+        var teacher_id = $("#teacher_id").val();
+        var teacher_pwd = $("#teacher_pwd").val();
+        alert(teacher_id+teacher_pwd)
+        $.ajax({
+            url : "/auth/teacherLogin/",
+            type : "post",
+            // data表示发送的数据
+            data : JSON.stringify({
+                email : teacher_id,
+                pwd: teacher_pwd
+            }),
+            // 定义发送请求的数据格式为JSON字符串
+            contentType : "application/json",
+            //定义回调响应的数据格式为JSON字符串,该属性可以省略
+            dataType : "text",
+            //成功响应的结果
+            success : function(res) {
+                // var storage=window.localStorage
+                // 将 res 解析为 JSON 对象
+                var responseObject = JSON.parse(res);
+                alert(responseObject.state)
+                if (responseObject.state!=false){
+                    var response = JSON.parse(res);
+                    console.log("res.token:",response.token)
+                    //保存信息到本地，里面都token
+                    localStorage.setItem("token",JSON.stringify(response.token));
+                    localStorage.setItem("t",JSON.stringify(response.t));
+                    console.log(window.localStorage.getItem("t"))
+                    $.ajax({
+                        url : "/index",
+                        type : "GET",
+                        contentType : "application/json",
+                        beforeSend: function(xhr) {
+                            // 在发送请求之前设置 Authorization 头部
+                            var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+                            xhr.setRequestHeader("Authorization", "Bearer " + token);
+                        },
+                        success : function(response) {
+                            console.log("登录成功")
+                            window.location.href = "./pages/teacher/index.html";
+                        },
+                        error: function(error) {
+                            // 处理错误
+                            console.log("error:",error)
+                        }
+                    });
+                }else {
+                    alert("密码错误请重新登录")
+                    window.location.reload()
+                }
+            },
+            error:function (res) {
+                console.log(res);
+            }
+        });
+
+    }
+    function takeToenLogin(){
+        $.ajax({
+            url : "/index",
+            type : "GET",
+            contentType : "application/json",
+            beforeSend: function(xhr) {
+                // 在发送请求之前设置 Authorization 头部
+                var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+                xhr.setRequestHeader("Authorization", "Bearer " + token);
+            },
+            success : function(response) {
+                console.log("登录成功")
+                window.location.href = "./pages/index.html";
+            },
+            error: function(error) {
+                // 处理错误
+                console.log("error:",error)
+            }
+        });
+    }
+    function switchTab(identity) {
+        // Hide all forms
+        var forms = document.getElementsByClassName('login-form');
+        for (var i = 0; i < forms.length; i++) {
+            forms[i].style.display = 'none';
+        }
+
+        // Remove active class from all tabs
+        var tabs = document.getElementsByClassName('tab-header')[0].children;
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove('active');
+        }
+
+        // Show the selected form and highlight the tab
+        document.getElementById(identity + '-form').style.display = 'block';
+        document.querySelector('.tab-header div[onclick="switchTab(\'' + identity + '\')"]').classList.add('active');
+    }
+    function submitForm(event) {
+        event.preventDefault(); // Prevent form from submitting the traditional way
+        var identity = event.target.id.replace('-form', '');
+        alert(identity + ' login submitted');
+        // Add your form submission logic here
+    }
+
+    // Add event listeners
+    document.getElementById('admin-form').addEventListener('submit', submitForm);
+    document.getElementById('student-form').addEventListener('submit', submitForm);
+    document.getElementById('teacher-form').addEventListener('submit', submitForm);
 </script>
 </body>
 </html>

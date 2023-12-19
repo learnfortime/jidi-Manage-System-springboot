@@ -5,11 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.xml.soap.Text;
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Courses {
+public class Courses implements Serializable {
     private Integer course_ID;
 
     private String course_name;
@@ -18,4 +20,5 @@ public class Courses {
 
     private String course_content;
 
+    private List<Teachers> listTeacher;
 }

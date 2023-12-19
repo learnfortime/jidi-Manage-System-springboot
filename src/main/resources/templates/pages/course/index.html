@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo</title>
+    <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+    <script type="text/javascript" src="../../js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+    <link href="//unpkg.com/layui@2.9.1/dist/css/layui.css" rel="stylesheet">
+</head>
+<body>
+<table class="layui-hide" id="ID-table-demo-data"></table>
+
+<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
+<script src="//unpkg.com/layui@2.9.1/dist/layui.js"></script>
+<script>
+    layui.use(['table', 'layer'], function(){
+        var table = layui.table;
+        var layer = layui.layer;
+
+        // 初始化表格
+        table.render({
+            elem: '#ID-table-demo-data',
+            cols: [[
+                {field: 'course_ID', title: '课程ID', width: 80, sort: true},
+                {field: 'course_name', title: '用户', width: 120},
+                {field: 'course_description', title: '签名', width: 250},
+                {field: 'course_content', title: '内容', midWidth: 150},
+                {
+                    title: '操作',
+                    width: 200,
+                    align: 'center',
+                    toolbar: '#actionBar' // 绑定操作栏
+                }
+            ]],
+            page: true,
+            limits: [5, 10, 15],
+            limit: 5
+        });
+
+        // 加载数据
+        $.ajax({
+            url: '/course/list', // 替换为你的 API 端点
+            type: 'GET',
+            beforeSend: function(xhr) {
+                var token = window.localStorage.getItem("token");
+                xhr.setRequestHeader("Authorization", "Bearer " + token);
+            },
+            success: function (res) {
+                table.reload('ID-table-demo-data', {
+                    data: res.list
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX 请求失败: " + status + ", " + error);
+            }
+        });
+
+        // 处理工具栏的事件
+        table.on('tool(ID-table-demo-data)', function(obj){
+            var data = obj.data;
+            var layEvent = obj.event;
+            var course_ID = data.course_ID;
+
+            console.log(data,layEvent,course_ID)
+
+            if(layEvent === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url: '/course/delete/' + course_ID, // 请替换为你的删除 API 端点
+                        type: 'DELETE',
+                        beforeSend: function(xhr) {
+                            var token = window.localStorage.getItem("token");
+                            xhr.setRequestHeader("Authorization", "Bearer " + token);
+                        },
+                        success: function(res) {
+                            layer.msg('删除成功', {icon: 1});
+                            window.location.reload()
+                        },
+                        error: function(xhr, status, error) {
+                            // 处理删除时的错误
+                            layer.msg('删除失败: ' + error, {icon: 2});
+                        }
+                    });
+                    layer.close(index);
+
+            });
+            } else if(layEvent === 'edit'){
+                layer.open({
+                    type: 1, // 弹出框类型，1 表示页面层
+                    area: ['800px', '600px'], // 宽高
+                    title: '编辑课程信息', // 标题
+                    content: '<div style="padding: 20px;">' +
+                        '<form id="editForm" class="layui-form" action="">' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程ID</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_ID" required  lay-verify="required" placeholder="课程ID" autocomplete="off" class="layui-input" value="' + data.course_ID + '" readonly>' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程名</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_name" required  lay-verify="required" placeholder="请输入课程名" autocomplete="off" class="layui-input" value="' + data.course_name + '">' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程描述</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_description" placeholder="请输入课程描述" autocomplete="off" class="layui-input" value="' + data.course_description + '">' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程内容</label>' +
+                        '<div class="layui-input-block">' +
+                        '<textarea name="course_content" placeholder="请输入课程内容" class="layui-textarea">' + data.course_content + '</textarea>'+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<div class="layui-input-block">' +
+                        '<button class="layui-btn" lay-submit lay-filter="saveEdit" onclick="updateCourse()">保存</button>' +
+                        '</div></div>' +
+                        '</form></div>',
+                });
+            }else if (layEvent === 'add'){
+                layer.open({
+                    type: 1, // 弹出框类型，1 表示页面层
+                    area: ['800px', '600px'], // 宽高
+                    title: '编辑课程信息', // 标题
+                    content: '<div style="padding: 20px;">' +
+                        '<form id="addForm" class="layui-form" action="">' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程ID</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_ID" required  lay-verify="required" placeholder="课程ID" autocomplete="off" class="layui-input">' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程名</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_name" required  lay-verify="required" placeholder="请输入课程名" autocomplete="off" class="layui-input" >' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程描述</label>' +
+                        '<div class="layui-input-block">' +
+                        '<input type="text" name="course_description" placeholder="请输入课程描述" autocomplete="off" class="layui-input" >' +
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<label class="layui-form-label">课程内容</label>' +
+                        '<div class="layui-input-block">' +
+                        '<textarea name="course_content" placeholder="请输入课程内容" class="layui-textarea"></textarea>'+
+                        '</div></div>' +
+                        '<div class="layui-form-item">' +
+                        '<div class="layui-input-block">' +
+                        '<button class="layui-btn" lay-submit lay-filter="saveEdit" onclick="addCourse()">添加</button>' +
+                        '</div></div>' +
+                        '</form></div>',
+                    success: function(layero, index) {
+
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script type="text/html" id="actionBar">
+    <a class="layui-btn layui-btn-green layui-btn-xs" lay-event="add">添加</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">更新</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+</body>
+</html>

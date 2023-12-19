@@ -1,10 +1,693 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <title>table 组件综合演示 - Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//cdn.staticfile.org/layui/2.9.0/css/layui.css" rel="stylesheet">
 </head>
 <body>
-    教师列表
+<!--
+本「综合演示」包含：自定义头部工具栏、获取表格数据、表格重载、自定义模板、单双行显示、单元格编辑、自定义底部分页栏、表格相关事件与操作、与其他组件的结合等相对常用的功能，以便快速掌握 table 组件的使用。
+-->
+<div style="padding: 16px;">
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+</div>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getData">获取当前页数据</button>
+        <button class="layui-btn layui-btn-sm" id="dropdownButton">
+            下拉按钮
+            <i class="layui-icon layui-icon-down layui-font-12"></i>
+        </button>
+        <button class="layui-btn layui-btn-sm layui-bg-blue" id="reloadTest">
+            重载测试
+            <i class="layui-icon layui-icon-down layui-font-12"></i>
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="rowMode">
+            <span>{{= d.lineStyle ? '多行' : '单行' }}模式</span>
+            <i class="layui-icon layui-icon-down layui-font-12"></i>
+        </button>
+    </div>
+</script>
+<script type="text/html" id="barDemo">
+    <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="more">
+            更多
+            <i class="layui-icon layui-icon-down"></i>
+        </a>
+    </div>
+</script>
+<script src="//cdn.staticfile.org/layui/2.9.0/layui.js"></script>
+<script type="text/javascript" src="list.js"></script>
+<script type="text/javascript" src="../../js/jquery-3.3.1.min.js"></script>
+<script>
+    function addTeacher() {
+        // Create an instance of XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+        var teacher_id = document.querySelector('input[name="teacher_id"]').value;
+        var teacher_name = document.querySelector('input[name="teacher_name"]').value;
+        var email = document.querySelector('input[name="email"]').value;
+        var phoneNumber = document.querySelector('input[name="phoneNumber"]').value;
+        var expertise = document.querySelector('input[name="expertise"]').value;
+        var pwd = document.querySelector('input[name="pwd"]').value;
+        // Configure the request (Method, URL, Asynchronous)
+
+        //add token
+        var token = localStorage.getItem('token');
+        xhr.open('POST', '/teacher/insert/', true);
+
+        // Set up a function to handle the server response
+        xhr.onreadystatechange = function() {
+            // Check if the request is complete
+            if (xhr.readyState == 4) {
+                // Check if the request was successful
+                if (xhr.status == 200) {
+                    // Handle the response data here
+                    console.log(xhr.responseText);
+                } else {
+                    // Handle error here
+                    console.error('AJAX request failed');
+                }
+            }
+        };
+
+        // Set the request headers if necessary, for example, for sending JSON data
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+
+        // Prepare the data you want to send, here's an example with JSON data
+        var data = JSON.stringify({
+            teacher_id : teacher_id,
+            teacher_name:teacher_name,
+            email: email,
+            phoneNumber : phoneNumber,
+            expertise : expertise,
+            pwd : pwd
+        });
+
+        // Send the request with data
+        xhr.send(data);
+    }
+    function updateTeacher(){
+        // Create an instance of XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+        var teacher_id = document.querySelector('input[name="teacher_id1"]').value;
+        var teacher_name = document.querySelector('input[name="teacher_name1"]').value;
+        var email = document.querySelector('input[name="email1"]').value;
+        var phoneNumber = document.querySelector('input[name="phoneNumber1"]').value;
+        var expertise = document.querySelector('input[name="expertise1"]').value;
+        var pwd = document.querySelector('input[name="pwd1"]').value;
+        // Configure the request (Method, URL, Asynchronous)
+
+        //add token
+        var token = localStorage.getItem('token');
+        xhr.open('POST', '/teacher/update/', true);
+
+        // Set up a function to handle the server response
+        xhr.onreadystatechange = function() {
+            // Check if the request is complete
+            if (xhr.readyState == 4) {
+                // Check if the request was successful
+                if (xhr.status == 200) {
+                    // Handle the response data here
+                    console.log(xhr.responseText);
+                } else {
+                    // Handle error here
+                    console.error('AJAX request failed');
+                }
+            }
+        };
+
+        // Set the request headers if necessary, for example, for sending JSON data
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+
+        // Prepare the data you want to send, here's an example with JSON data
+        var data = JSON.stringify({
+            teacher_id : teacher_id,
+            teacher_name:teacher_name,
+            email: email,
+            phoneNumber : phoneNumber,
+            expertise : expertise,
+            pwd : pwd
+        });
+
+        // Send the request with data
+        xhr.send(data);
+    }
+    function deleteTeacher(teacher_id){
+        var token = localStorage.getItem('token');
+
+        fetch('/teacher/delete/' + teacher_id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                // 'Content-Type': 'application/json' // This header is optional for DELETE requests
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                window.location.reload()
+                return response.text();
+            })
+            .then(text => {
+                console.log(text);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+</script>
+<script>
+    layui.use(['table', 'dropdown'], function(){
+        var dropdown = layui.dropdown;
+        var table = layui.table;
+        // 创建渲染实例
+        table.render({
+            elem: '#test',
+            url: 'http://localhost:8001/teacher/list/', // 此处为静态模拟数据，实际使用时需换成真实接口
+            method: 'get', // 请求类型
+            where: {}, // 如果有额外的查询参数可以在这里设置
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token') // 从localStorage中获取token
+            },
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            height: 'full-35', // 最大高度减去其他容器已占有的高度差
+            css: [ // 重设当前表格样式
+                '.layui-table-tool-temp{padding-right: 145px;}'
+            ].join(''),
+            cellMinWidth: 80,
+            totalRow: true, // 开启合计行
+            page: true,
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                // {field:'email', title:'邮箱 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="email-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '邮箱', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
+                {field: 'teacher_id', title: 'ID', sort: true},
+                {field: 'teacher_name', title: '姓名'},
+                {field: 'email', title: '邮箱'},
+                {field: 'phoneNumber', title: '电话号码'},
+                {field: 'expertise', title: '专长'},
+                {field: 'pwd', title: '密码'},
+                {
+                    field: 'listCourses',
+                    title: '课程',
+                    templet: function(d) {
+                        return d.listCourses.map(function(course) {
+                            return course.course_name;
+                        }).join(", ");
+                    }
+                },
+                {fixed: 'right', title:'操作', width: 134, minWidth: 125, toolbar: '#barDemo'}
+            ]],
+            parseData: function(res) { // 将原始数据解析成 table 组件所规定的格式
+                return {
+                    "code": 0,
+                    "msg": "",
+                    "count": res.length,
+                    "data": res.list
+                };
+            },
+            done: function(){
+                var id = this.id;
+                // 下拉按钮测试
+                dropdown.render({
+                    elem: '#dropdownButton', // 可绑定在任意元素中，此处以上述按钮为例
+                    data: [{
+                        id: 'add',
+                        title: '添加'
+                    },{
+                        id: 'update',
+                        title: '编辑'
+                    },{
+                        id: 'delete',
+                        title: '删除'
+                    }],
+                    // 菜单被点击的事件
+                    click: function(obj){
+                        var checkStatus = table.checkStatus(id)
+                        var data = checkStatus.data; // 获取选中的数据
+                        switch(obj.id){
+                            case 'add':
+                                layer.open({
+                                    title: '添加',
+                                    type: 1,
+                                    area: ['80%','80%'],
+                                    content: '<div style="padding: 16px;">\n' +
+                                        '    <form id="addTeacherForm">\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">教师ID：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="teacher_id" required  lay-verify="required" placeholder="请输入教师ID" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">姓名：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="teacher_name" required lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">邮箱：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="email" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">电话号码：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="phoneNumber" required lay-verify="required" placeholder="请输入电话号码" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">专长：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="expertise" required lay-verify="required" placeholder="请输入专长" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">密码：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="password" name="pwd" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <button type="submit" class="layui-btn"lay-submit lay-filter="submitForm"  onclick="addTeacher()">提交</button>\n' +
+                                        '                <button type="reset" class="layui-btn layui-btn-primary">重置</button>\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '    </form>\n' +
+                                        '</div>'
+                                });
+                                break;
+                            case 'update':
+                                if(data.length !== 1) return layer.msg('请选择一行');
+                                var selectedData = data
+                                layer.open({
+                                    title: '编辑',
+                                    type: 1,
+                                    area: ['80%','80%'],
+                                    content: '<div id="editForm" style="padding: 16px;">\n' +
+                                        '    <form class="layui-form" action="">\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">教师ID：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="teacher_id1" required lay-verify="required" placeholder="请输入教师ID" autocomplete="off" class="layui-input" readonly>\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">姓名：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="teacher_name1" required lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">邮箱：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="email1" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">电话号码：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="phoneNumber1" required lay-verify="required" placeholder="请输入电话号码" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">专长：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="text" name="expertise1" required lay-verify="required" placeholder="请输入专长" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <label class="layui-form-label">密码：</label>\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <input type="password" name="pwd1" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '        <div class="layui-form-item">\n' +
+                                        '            <div class="layui-input-block">\n' +
+                                        '                <button type="submit" class="layui-btn" lay-submit lay-filter="submitEditForm" onclick="updateTeacher()">保存</button>\n' +
+                                        '                <button type="reset" class="layui-btn layui-btn-primary">重置</button>\n' +
+                                        '            </div>\n' +
+                                        '        </div>\n' +
+                                        '    </form>\n' +
+                                        '</div>',
+                                    success: function(layero, index){
+                                        // Directly set the values of each input field
+                                        var form = document.getElementById('editForm');
+                                        if (form) {
+                                            var teacherIdInput = form.querySelector('input[name="teacher_id1"]');
+                                            var teacherNameInput = form.querySelector('input[name="teacher_name1"]');
+                                            var emailInput = form.querySelector('input[name="email1"]');
+                                            var phoneNumberInput = form.querySelector('input[name="phoneNumber1"]');
+                                            var expertiseInput = form.querySelector('input[name="expertise1"]');
+                                            var pwdInput = form.querySelector('input[name="pwd1"]');
+
+                                            if (teacherIdInput) teacherIdInput.value = selectedData[0].teacher_id;
+                                            if (teacherNameInput) teacherNameInput.value = selectedData[0].teacher_name;
+                                            if (emailInput) emailInput.value = selectedData[0].email;
+                                            if (phoneNumberInput) phoneNumberInput.value = selectedData[0].phoneNumber;
+                                            if (expertiseInput) expertiseInput.value = selectedData[0].expertise;
+                                            if (pwdInput) pwdInput.value = selectedData[0].pwd;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 'delete':
+                                if(data.length === 0){
+                                    return layer.msg('请选择一行');
+                                }
+                                layer.msg('delete event');
+                                for (let i = 0;i<data.length;i++){
+                                    //让我想起了多线程安全问题
+                                    deleteTeacher(data[i].teacher_id)
+                                    console.log(data[i].teacher_id)
+                                }
+                                break;
+                        }
+                    }
+                });
+
+                // 重载测试
+                dropdown.render({
+                    elem: '#reloadTest', // 可绑定在任意元素中，此处以上述按钮为例
+                    data: [{
+                        teacher_id: 'reload',
+                        title: '重载'
+                    },{
+                        teacher_id: 'reload-deep',
+                        title: '重载 - 参数叠加'
+                    },{
+                        teacher_id: 'reloadData',
+                        title: '仅重载数据'
+                    },{
+                        teacher_id: 'reloadData-deep',
+                        title: '仅重载数据 - 参数叠加'
+                    }],
+                    // 菜单被点击的事件
+                    click: function(obj){
+                        switch(obj.id){
+                            case 'reload':
+                                // 重载 - 默认（参数重置）
+                                table.reload('test', {
+                                    where: {
+                                        abc: '123456',
+                                        //test: '新的 test2',
+                                        //token: '新的 token2'
+                                    },
+                                    /*
+                                    cols: [[ // 重置表头
+                                      {type: 'checkbox', fixed: 'left'},
+                                      {field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true, totalRowText: '合计：'},
+                                      {field:'sex', title:'性别', width:80, edit: 'text', sort: true},
+                                      {field:'experience', title:'积分', width:80, sort: true, totalRow: true, templet: '<div>{{= d.experience }} 分</div>'},
+                                      {field:'logins', title:'登入次数', width:100, sort: true, totalRow: true},
+                                      {field:'joinTime', title:'加入时间', width:120}
+                                    ]]
+                                    */
+                                });
+                                break;
+                            case 'reload-deep':
+                                // 重载 - 深度（参数叠加）
+                                table.reload('test', {
+                                    where: {
+                                        abc: 123,
+                                        test: '新的 test1'
+                                    },
+                                    //defaultToolbar: ['print'], // 重载头部工具栏右侧图标
+                                    //cols: ins1.config.cols
+                                }, true);
+                                break;
+                            case 'reloadData':
+                                // 数据重载 - 参数重置
+                                table.reloadData('test', {
+                                    where: {
+                                        abc: '123456',
+                                        //test: '新的 test2',
+                                        //token: '新的 token2'
+                                    },
+                                    scrollPos: 'fixed',  // 保持滚动条位置不变 - v2.7.3 新增
+                                    height: 2000, // 测试无效参数（即与数据无关的参数设置无效，此处以 height 设置无效为例）
+                                    //url: '404',
+                                    //page: {curr: 1, limit: 30} // 重新指向分页
+                                });
+                                break;
+                            case 'reloadData-deep':
+                                // 数据重载 - 参数叠加
+                                table.reloadData('test', {
+                                    where: {
+                                        abc: 123,
+                                        test: '新的 test1'
+                                    }
+                                }, true);
+                                break;
+                        }
+                        layer.msg('可观察 Network 请求参数的变化');
+                    }
+                });
+
+                // 行模式
+                dropdown.render({
+                    elem: '#rowMode',
+                    data: [{
+                        id: 'default-row',
+                        title: '单行模式（默认）'
+                    },{
+                        id: 'multi-row',
+                        title: '多行模式'
+                    }],
+                    // 菜单被点击的事件
+                    click: function(obj){
+                        var checkStatus = table.checkStatus(id)
+                        var data = checkStatus.data; // 获取选中的数据
+                        switch(obj.id){
+                            case 'default-row':
+                                table.reload('test', {
+                                    lineStyle: null // 恢复单行
+                                });
+                                layer.msg('已设为单行');
+                                break;
+                            case 'multi-row':
+                                table.reload('test', {
+                                    // 设置行样式，此处以设置多行高度为例。若为单行，则没必要设置改参数 - 注：v2.7.0 新增
+                                    lineStyle: 'height: 95px;'
+                                });
+                                layer.msg('即通过设置 lineStyle 参数可开启多行');
+                                break;
+                        }
+                    }
+                });
+            },
+            error: function(res, msg){
+                console.log(res, msg)
+            }
+        });
+
+        // 工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var id = obj.config.id;
+            var checkStatus = table.checkStatus(id);
+            var othis = lay(this);
+            switch(obj.event){
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(layui.util.escape(JSON.stringify(data)));
+                    break;
+                case 'getData':
+                    var getData = table.getData(id);
+                    console.log(getData);
+                    layer.alert(layui.util.escape(JSON.stringify(getData)));
+                    break;
+                case 'LAYTABLE_TIPS':
+                    layer.alert('自定义工具栏图标按钮');
+                    break;
+            };
+        });
+        // 表头自定义元素工具事件 --- 2.8.8+
+        table.on('colTool(test)', function(obj){
+            var event = obj.event;
+            console.log(obj);
+            if(event === 'email-tips'){
+                layer.alert(layui.util.escape(JSON.stringify(obj.col)), {
+                    title: '当前列属性配置项'
+                });
+            }
+        });
+
+        // 触发单元格工具事件
+        table.on('tool(test)', function(obj){ // 双击 toolDouble
+            var data = obj.data; // 获得当前行数据
+            // console.log(obj)
+            if(obj.event === 'edit'){
+                layer.open({
+                    title: '编辑 - id:'+ data.id,
+                    type: 1,
+                    area: ['80%','80%'],
+                    content: '<div style="padding: 16px;">自定义表单元素</div>'
+                });
+            } else if(obj.event === 'more'){
+                // 更多 - 下拉菜单
+                dropdown.render({
+                    elem: this, // 触发事件的 DOM 对象
+                    show: true, // 外部事件触发即显示
+                    data: [{
+                        title: '查看',
+                        id: 'detail'
+                    },{
+                        title: '删除',
+                        id: 'del'
+                    },{
+                        title: "添加课程",
+                        id:'addCourse'
+                    }
+                    ],
+                    click: function(menudata){
+                        if(menudata.id === 'detail'){
+                            layer.msg('查看操作，当前行 ID:'+ data.teacher_id);
+                        } else if(menudata.id === 'del'){
+                            layer.confirm('真的删除行 [id: '+ data.teacher_id +'] 么', function(index){
+                                obj.del(); // 删除对应行（tr）的DOM结构
+                                layer.close(index);
+                                // 获取存储的token
+                                var token = localStorage.getItem('token');
+
+                                // 设置请求头
+                                var headers = new Headers();
+                                headers.append('Authorization', 'Bearer ' + token);
+                                headers.append('Content-Type', 'application/json');
+
+                                // 发送删除请求
+                                fetch('http://localhost:8001/teacher/delete/' + data.teacher_id, {
+                                    method: 'DELETE',
+                                    headers: headers
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Success:', data);
+                                        // 处理成功响应
+                                    })
+                                    .catch((error) => {
+                                        console.error('Error:', error);
+                                        // 处理错误响应
+                                    });
+                            });
+                        }else if(menudata.id === 'addCourse'){
+                            // 在此处输入 layer 的任意代码
+                            layer.open({
+                                type: 1, // page 层类型
+                                area: ['500px', '300px'],
+                                title: 'Hello layer',
+                                shade: 0.6, // 遮罩透明度
+                                shadeClose: true, // 点击遮罩区域关闭弹层
+                                maxmin: true, // 允许全屏最小化
+                                anim: 0, // 0-6 的动画形式，-1 不开启
+                                content:
+                                    '<div id="layerContent" style="padding: 32px;">' +
+                                    '</div>' +
+                                    '<button id="submitBtn" style="margin: 15px;color: #00b5f9">提交</button>', // 添加了i
+                                success: function(layero, index) {
+                                    // 在这里发起 AJAX 请求
+                                    $.ajax({
+                                        url: '/course/list/', // 确保这是有效的 API 端点
+                                        type: 'GET',
+                                        beforeSend: function(xhr) {
+                                            // 在发送请求之前设置 Authorization 头部
+                                            var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+                                            xhr.setRequestHeader("Authorization", "Bearer " + token);
+                                        },
+                                        success: function(data) {
+                                            console.log(data); // 首先在控制台查看数据
+                                            let parseData = JSON.stringify(data);
+                                            var contentHtml = '';
+                                            if (typeof parseData === 'string') {
+                                                console.log("parseData:",data)
+                                                var selectHtml  = createSelectOptions(data);
+                                            } else {
+                                                alert("错误信息")
+                                                contentHtml = data; // 否则直接使用
+                                            }
+                                            console.log("selectHtml:",selectHtml)
+                                            document.getElementById('layerContent').appendChild(selectHtml);
+                                            // $('#layerContent').html(JSON.stringify(contentHtml, null, 2)); // 使用 JSON.stringify 来格式化显示对象
+                                        },
+                                        error: function(xhr, status, error) {
+                                            // 请求失败，显示错误信息
+                                            $('#layerContent').html('加载失败: ' + error);
+                                        }
+                                    });
+
+                                    document.getElementById('submitBtn').addEventListener('click', function() {
+                                        // 获取 select 的值
+                                        var selectedCourseID = document.getElementById('courseSelect').value;
+                                        // 调用 submitCourse 函数
+                                        sumbitCourse(data.teacher_id,selectedCourseID);
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    align: 'right', // 右对齐弹出
+                    style: 'box-shadow: 1px 1px 10px rgb(0 0 0 / 12%);' // 设置额外样式
+                })
+            }
+        });
+
+        // 触发表格复选框选择
+        table.on('checkbox(test)', function(obj){
+            console.log(obj)
+        });
+
+        // 触发表格单选框选择
+        table.on('radio(test)', function(obj){
+            console.log(obj)
+        });
+
+        // 行单击事件
+        table.on('row(test)', function(obj){
+            //console.log(obj);
+            //layer.closeAll('tips');
+        });
+        // 行双击事件
+        table.on('rowDouble(test)', function(obj){
+            console.log(obj);
+        });
+
+        // 单元格编辑事件
+        table.on('edit(test)', function(obj){
+            var field = obj.field; // 得到字段
+            var value = obj.value; // 得到修改后的值
+            var data = obj.data; // 得到所在行所有键值
+            // 值的校验
+            if(field === 'email'){
+                if(!/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(obj.value)){
+                    layer.tips('输入的邮箱格式不正确，请重新编辑', this, {tips: 1});
+                    return obj.reedit(); // 重新编辑 -- v2.8.0 新增
+                }
+            }
+            // 编辑后续操作，如提交更新请求，以完成真实的数据更新
+            // …
+            layer.msg('编辑成功', {icon: 1});
+
+            // 其他更新操作
+            var update = {};
+            update[field] = value;
+            obj.update(update);
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 package com.qzk.dao;
 
 import com.qzk.pojo.Students;
-import com.qzk.pojo.StudentsExtends;
+//import com.qzk.pojo.StudentsExtends;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -14,7 +14,10 @@ public interface StudentsMapper {
 
     int updateByPrimaryKey(Students students);
 
-    StudentsExtends selectByPrimaryKey(int id);
+    List<Students> selectByPrimaryKey(Integer student_id,String student_name,String email,String phoneNumber,Integer progress,Integer gradeAndCertificateID,String certificateURL);
 
-    List<StudentsExtends> selectAll();
+    int insertCertificate(Integer student_id,Integer gradeAndCertificateID);
+
+    Students boolStudent(Students students);
+    List<Students> selectAll();
 }

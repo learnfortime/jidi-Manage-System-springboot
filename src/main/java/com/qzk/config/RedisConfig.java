@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -92,6 +93,25 @@ public class RedisConfig {
     RedisSerializationContext.SerializationPair<Object> valuePair(){
         return RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer());
     }
+    /**
+     * 配置jdk缓存前缀问题   默认情况jdk读取缓存会使用自己的default配置
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
 
+        // 使用 StringRedisSerializer 来序列化和反序列化 redis 的 key 值
+        template.setKeySerializer(new StringRedisSerializer());
+
+        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        ObjectMapper mapper = new ObjectMapper();
+        serializer.setObjectMapper(mapper);
+        template.setValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
 }
 

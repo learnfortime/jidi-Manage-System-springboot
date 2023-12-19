@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layout 管理界面大布局示例 - Layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//cdn.staticfile.org/layui/2.9.0/css/layui.css" rel="stylesheet">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo layui-hide-xs layui-bg-black">基地管理系统</div>
+    <!-- 头部区域（可配合layui 已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+      <!-- 移动端显示 -->
+      <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+        <i class="layui-icon layui-icon-spread-left"></i>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+        <a href="javascript:;">
+          <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+          老师身份
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="javascript:;" id="mySettings" >个人信息</a></dd>
+          <dd><a href="javascript:;" onclick="signOut()">退出</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+        <a href="javascript:;">
+          <i class="layui-icon layui-icon-more-vertical"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a class="" href="javascript:;">menu group 1</a>
+<!--          <dl class="layui-nav-child">-->
+<!--            <dd><a href="javascript:;">menu 1</a></dd>-->
+<!--            <dd><a href="javascript:;">menu 2</a></dd>-->
+<!--            <dd><a href="javascript:;">menu 3</a></dd>-->
+<!--            <dd><a href="javascript:;">the links</a></dd>-->
+<!--          </dl>-->
+        </li>
+<!--        <li class="layui-nav-item">-->
+<!--          <a href="javascript:;">menu group 2</a>-->
+<!--          <dl class="layui-nav-child">-->
+<!--            <dd><a href="javascript:;">list 1</a></dd>-->
+<!--            <dd><a href="javascript:;">list 2</a></dd>-->
+<!--            <dd><a href="javascript:;">超链接</a></dd>-->
+<!--          </dl>-->
+<!--        </li>-->
+<!--        <li class="layui-nav-item"><a href="javascript:;">click menu item</a></li>-->
+<!--        <li class="layui-nav-item"><a href="javascript:;">the links</a></li>-->
+      </ul>
+    </div>
+  </div>
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">
+      <blockquote class="layui-elem-quote layui-text">
+        基地管理系统学生列表
+      </blockquote>
+      <div class="layui-card layui-panel">
+<!--        <div class="layui-card-header">-->
+<!--&lt;!&ndash;          下面是充数内容，为的是出现滚动条&ndash;&gt;-->
+<!--        </div>-->
+        <div class="layui-card-body" id="content">
+          <iframe src="../team/list.html" width="100%" height="600"></iframe>
+        </div>
+      </div>
+      <br><br>
+    </div>
+  </div>
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    底部固定区域
+  </div>
+
+</div>
+<script src="//cdn.staticfile.org/layui/2.9.0/layui.js"></script>
+<script>
+  layui.use(['element', 'layer', 'util'], function(){
+    var element = layui.element;
+    var layer = layui.layer;
+    var util = layui.util;
+    var $ = layui.$;
+
+    //头部事件
+    util.event('lay-header-event', {
+      menuLeft: function(othis){ // 左侧菜单事件
+        layer.msg('展开左侧菜单的操作', {icon: 0});
+      },
+      menuRight: function(){  // 右侧菜单事件
+        layer.open({
+          type: 1,
+          title: '更多',
+          content: '<div style="padding: 15px;">处理右侧面板的操作</div>',
+          area: ['260px', '100%'],
+          offset: 'rt', // 右上角
+          anim: 'slideLeft', // 从右侧抽屉滑出
+          shadeClose: true,
+          scrollbar: false
+        });
+      }
+    });
+  });
+  function signOut(){
+      // Clear session data
+      window.localStorage.removeItem('token'); // Replace 'token' with the key you use to store session data
+      window.localStorage.removeItem('t');
+
+      // Redirect to the login page
+      window.location.href = '/login.html'; // Replace with the path to your login page
+  }
+  // 确保 DOM 完全加载
+  document.addEventListener('DOMContentLoaded', function () {
+    // 获取 “个人设置” 链接
+    var settingsLink = document.getElementById('mySettings');
+
+    // 为 “个人设置” 链接添加点击事件监听器
+    settingsLink.addEventListener('click', function() {
+      // 调用 layer.open 弹出层
+      layer.open({
+        type: 1, // page 层类型
+        area: ['500px', '300px'],
+        title: '个人信息',
+        shade: 0.6, // 遮罩透明度
+        shadeClose: true, // 点击遮罩区域，关闭弹层
+        maxmin: true, // 允许全屏最小化
+        anim: 0, // 0-6 的动画形式，-1 不开启
+        content: '<div style="padding: 32px;" id="teacherInfo"></div>' ,// 自定义内容,
+        success: function(layero, index) {
+          // 这里确保弹出层已经打开且元素已经添加到 DOM
+          var teacherInfo = JSON.parse(localStorage.getItem('t'));
+          var formattedText = '';
+          for (var key in teacherInfo) {
+            if (teacherInfo.hasOwnProperty(key)) {
+              // 检查属性值是否为 'listCourses' 且是数组类型
+              if (key === 'listCourses' && Array.isArray(teacherInfo[key]) && teacherInfo[key].length > 0) {
+                // 处理 'listCourses' 数组的第一个元素
+                var course = teacherInfo[key][0];
+                formattedText += key + ': ';
+                if (course && typeof course === 'object') {
+                  // 提取并显示课程信息，这里假设是 'course_name'
+                  formattedText += (course.course_name || '无');
+                } else {
+                  formattedText += '无';
+                }
+                formattedText += '<br>';
+              } else {
+                // 处理其他类型的属性
+                formattedText += key + ': ' + (teacherInfo[key] === null ? '无' : teacherInfo[key]) + '<br>';
+              }
+            }
+          }
+          if (teacherInfo) {
+            // teacherInfo = JSON.parse(teacherInfo);
+            document.getElementById('teacherInfo').innerHTML = formattedText;
+          }
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

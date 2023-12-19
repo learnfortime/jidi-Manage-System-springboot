@@ -5,19 +5,30 @@ server:
     context-path: /
 
 spring:
+  web:
+    resources:
+      static-locations: classpath:/templates/
   mvc:
+    static-path-pattern: /**
+    throw-exception-if-no-handler-found: true
     view:
       prefix: /
       suffix: .html
+#  mvc:
+#    view:
+#      prefix: /
+#      suffix: .html
+#  thymeleaf:
+#    prefix: classpath:/templates/
+#    suffix: .html
+#    cache: false  #关闭thymeleaf缓存
+#    mode: HTML5
+#    encoding: UTF-8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/j2e_jidimanagement?useSSL=false&serverTimezone=UTC
     username: root
     password: 3832414122.qzk
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    cache: false  #关闭thymeleaf缓存
   main:
     allow-circular-references: true
     #redis

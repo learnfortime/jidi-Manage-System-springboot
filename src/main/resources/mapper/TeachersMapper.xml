@@ -5,17 +5,81 @@
     <result column="teacher_id" jdbcType="INTEGER" property="teacher_id" />
     <result column="teacher_name" jdbcType="VARCHAR" property="teacher_name" />
     <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="pwd" jdbcType="VARCHAR" property="pwd"/>
     <result column="phoneNumber" jdbcType="VARCHAR" property="phoneNumber" />
     <result column="expertise" jdbcType="VARCHAR" property="expertise" />
   </resultMap>
+
+  <resultMap id="teacherWithCourses" type="com.qzk.pojo.Teachers">
+    <id column="teacher_id" jdbcType="INTEGER" property="teacher_id" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacher_name" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="phoneNumber" jdbcType="VARCHAR" property="phoneNumber" />
+    <result column="expertise" jdbcType="VARCHAR" property="expertise" />
+    <result column="pwd" jdbcType="VARCHAR" property="pwd"/>
+    <collection  property="listCourses" ofType="com.qzk.pojo.Courses">
+      <id column="course_ID" property="course_ID"/>
+      <result column="course_name" property="course_name"/>
+    </collection>
+  </resultMap>
   <insert id="insert" parameterType="com.qzk.pojo.Teachers">
     insert into teachers (teacher_id, teacher_name, email, 
-      phoneNumber, expertise)
+      phoneNumber, expertise,pwd)
     values (#{teacher_id,jdbcType=INTEGER}, #{teacher_name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{phoneNumber,jdbcType=VARCHAR}, #{expertise,jdbcType=VARCHAR})
+      #{phoneNumber,jdbcType=VARCHAR}, #{expertise,jdbcType=VARCHAR},#pwd{pwd})
   </insert>
-  <select id="selectAll" resultMap="BaseResultMap">
-    select teacher_id, teacher_name, email, phoneNumber, expertise
-    from teachers
+  <select id="selectAll" resultMap="teacherWithCourses">
+    select
+        t.teacher_id,t.teacher_name,t.email,t.phoneNumber,t.expertise,t.pwd,
+        c.course_ID,c.course_name
+    FROM  teachers t
+      LEFT JOIN teacher_courses tc ON t.teacher_id = tc.teacher_id
+      LEFT JOIN courses c  ON tc.course_ID = c.course_ID
   </select>
+  <update id="update" parameterType="com.qzk.pojo.Teachers">
+    UPDATE teachers
+    SET teacher_name = #{teacher_name},
+        email = #{email},
+        phoneNumber = #{phoneNumber},
+        expertise = #{expertise},
+        pwd = #{pwd}
+    WHERE teacher_id = #{teacher_id}
+  </update>
+  <delete id="delete" parameterType="java.lang.Integer">
+    delete from teachers
+    where teacher_id = #{teacher_id,jdbcType=INTEGER}
+  </delete>
+  <select id="selectByPrimaryKey" resultMap="teacherWithCourses">
+    SELECT
+        t.teacher_id,t.teacher_name,t.email,t.phoneNumber,t.expertise,t.pwd,
+        c.course_name
+    FROM teachers t , courses c
+    where t.teacher_id= #{teacher_id} and c.teacher_id = t.teacher
+  </select>
+  <select id="boolTeacher" parameterType="com.qzk.pojo.Teachers" resultMap="teacherWithCourses">
+    SELECT
+      t.teacher_id,
+      t.teacher_name,
+      t.email,
+      t.phoneNumber,
+      t.expertise,
+      t.pwd,
+      c.course_name
+    FROM teachers t
+           JOIN teacher_courses tc ON t.teacher_id = tc.teacher_id -- 假设 teacher_courses 是连接表
+           JOIN courses c ON tc.course_id = c.course_id
+    WHERE t.email = #{email}
+      AND t.pwd = #{pwd}
+      LIMIT 1;
+  </select>
+  <insert id="add" parameterType="com.qzk.pojo.Teachers">
+    insert into teachers (teacher_id, teacher_name, email,
+                          phoneNumber, expertise,pwd)
+    values (#{teacher_id,jdbcType=INTEGER}, #{teacher_name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+            #{phoneNumber,jdbcType=VARCHAR}, #{expertise,jdbcType=VARCHAR},#{pwd,jdbcType=VARCHAR})
+  </insert>
+  <insert id="addCource" parameterType="com.qzk.pojo.Teachers">
+    INSERT INTO teacher_courses (teacher_id, course_ID)
+    VALUES (#{teacher_id}, #{course_ID})
+  </insert>
 </mapper>

@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>更新球队</title>
+		<title>更新学生</title>
 		<script type="text/javascript" src="/js/jquery-1.11.1.js"></script>
 		<script type="text/javascript" src="/js/bootstrap.js"></script>
 		<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
@@ -13,65 +13,54 @@
 	</head>
 
 	<body>
-		<h2>更新球队</h2>
+		<h2>学生修改</h2>
 		<form id="myForm" class="form-horizontal">
-			<!--springmvc的restful风格处理非get post方式请求必备参数-->
-			<!--<input name="_method"  type="hidden" value="PUT"/>-->
 			<div class="form-group">
-				<label class="col-sm-1 control-label"><span>*</span>球队ID</label>
+				<label class="col-sm-1 control-label"><span>*</span>学生ID</label>
 				<div class="col-sm-9">
-					<input name="teamId"  type="text" disabled/>
+					<input required="required" name="student_id" class="form-control" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label">球队logo</label>
+				<label class="col-sm-1 control-label"><span>*</span>学生姓名</label>
 				<div class="col-sm-9">
-					<img name="logo" src="/img/uploadFile/"/>
-				</div>
-			</div>			
-			<div class="form-group">
-				<label class="col-sm-1 control-label"><span>*</span>英文名称</label>
-				<div class="col-sm-9">
-					<input required="required" name="teamName" class="form-control" />
+					<input required="" name="student_name" class="form-control" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label"><span>*</span>中文名称</label>
+				<label class="col-sm-1 control-label">email</label>
 				<div class="col-sm-9">
-					<input required="" name="chineseName" class="form-control" />
+					<input name="email" class="form-control" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label">主教练</label>
+				<label class="col-sm-1 control-label">电话号码</label>
 				<div class="col-sm-9">
-					<input name="coach" class="form-control" />
+					<input name="phoneNumber" class="form-control" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label">主场馆</label>
+				<label class="col-sm-1 control-label">完成进度</label>
 				<div class="col-sm-9">
-					<input name="stadium" class="form-control" />
+					<input name="process" class="form-control" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label">所属地区</label>
-				<div class="col-sm-9">
-					<input name="location" class="form-control" />
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-1 control-label">成立时间</label>
+				<label class="col-sm-1 control-label">证书ID</label>
 				<div class="col-sm-2">
-					<input name="createTime" class="form-control" type="date"/>
+					<input name="GradeAndCertificateID" class="form-control"/>
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-1 control-label">所属联盟</label>
+				<label class="col-sm-1 control-label">获奖证书</label>
 				<div class="col-sm-2">
 					<select name="area" class="form-control">
-         				<option value="-1">请选择所属联盟</option>
-         				<option value="0">东部联盟</option>
-         				<option value="1">西部联盟</option>
+         				<option></option>
+						<option value="1">国家奖学金</option>
+						<option value="2">ARM证书</option>
+						<option value="3">蓝桥杯证书</option>
+						<option value="4">创业创新证书</option>
+						<option value="5">华为网络证书</option>
 			      	</select>
 				</div>
 			</div>
@@ -86,6 +75,13 @@
 	</body>
 </html>
 <script>
+	window.onload = function() {
+		var urlParams = new URLSearchParams(window.location.search);
+		var id = urlParams.get('student_id');
+		if (id) {
+			document.getElementsByName('student_id')[0].value = id;
+		}
+	};
 	String.prototype.GetValue= function(para) {
 		let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
 		let r = this.substr(this.indexOf("\?")+1).match(reg);

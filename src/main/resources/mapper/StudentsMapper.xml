@@ -1,38 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qzk.dao.StudentsMapper">
-  <resultMap id="BaseResultMap" type="com.qzk.pojo.StudentsExtends">
+  <resultMap id="BaseResultMap" type="com.qzk.pojo.Students">
     <id column="student_id" property="student_id" />
     <result column="student_name" property="student_name" />
     <result column="email" property="email" />
     <result column="phoneNumber" property="phoneNumber" />
     <result column="progress" property="progress" />
-
-    <!-- onlinelearning -->
-    <result column="learning_id" property="learning_id" />
-    <result column="course_id" property="course_id" />
-    <result column="video_url" property="video_url" />
-    <result column="quiz_Results" property="quiz_Results" />
-
-    <!-- Assignmentsubmissions -->
-    <result column="submission_id" property="submission_id" />
-    <result column="teacher_id" property="teacher_id" />
-    <result column="assignment_name" property="assignment_name" />
-    <result column="submission_date" property="submission_date" />
-    <result column="grade" property="grade" />
-    <result column="submission_content" property="submission_content" />
-
-    <!-- gradesandcertificates -->
-<!--    <result column="gradeAndCertificateID" property="gradeAndCertificateID" />-->
-<!--    <result column="finalGrade" property="finalGrade" />-->
-<!--    <result column="certificateURL" property="certificateURL" />-->
       <collection property="gradesAndCertificates" ofType="com.qzk.pojo.Gradesandcertificates">
           <id column="gradeAndCertificateID" property="gradeAndCertificateID" />
-          <result column="course_id" property="course_id"/>
-          <result column="finalGrade" property="finalGrade" />
           <result column="certificateURL" property="certificateURL" />
       </collection>
   </resultMap>
+    <resultMap id="studentWithCertificatesMap" type="com.qzk.pojo.Students">
+        <id property="id" column="student_id"/>
+        <result property="name" column="student_name"/>
+        <!-- other fields -->
+        <collection property="gradesandcertificates" ofType="com.qzk.pojo.Gradesandcertificates"
+                    resultMap="GradesandcertificatesMapper.certificateMap"/>
+    </resultMap>
   <insert id="insert" parameterType="com.qzk.pojo.Students">
     insert into students (student_id, student_name, email, 
       phoneNumber, progress)
@@ -43,6 +29,11 @@
     delete from students
     where student_id = #{student_id,jdbcType=INTEGER}
   </delete>
+    <insert  id="insertCertificate" parameterType="com.qzk.pojo.Students">
+
+        INSERT INTO student_certificates (student_id, gradeAndCertificateID)
+        VALUES (#{student_id}, #{gradeAndCertificateID})
+    </insert >
   <update id="updateByPrimaryKey" parameterType="com.qzk.pojo.Students">
     UPDATE students
     SET student_name = #{student_name},
@@ -51,26 +42,48 @@
         progress = #{progress}
     WHERE student_id = #{student_id}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
     SELECT s.student_id, s.student_name, s.email, s.phoneNumber, s.progress,
-           o.learning_id, o.course_id, o.video_url, o.quiz_Results,
-           a.submission_id, a.teacher_id, a.assignment_name, a.submission_date, a.grade, a.submission_content,
-           g.course_id,g.gradeAndCertificateID, g.finalGrade, g.certificateURL
+           g.gradeAndCertificateID,g.certificateURL
     FROM students s
-           LEFT JOIN onlinelearning o ON s.student_id = o.student_id
-           LEFT JOIN assignmentsubmissions a ON s.student_id = a.student_id
-           LEFT JOIN gradesandcertificates g ON s.student_id = g.student_id
-    where s.student_id = #{student_id,jdbcType=INTEGER};
+      LEFT JOIN student_certificates sc ON s.student_id = sc.student_id
+      LEFT JOIN gradesandcertificates g ON sc.gradeAndCertificateID = g.gradeAndCertificateID
+      <where>
+          <if test="student_id != null">
+              AND s.student_id = #{student_id,jdbcType=INTEGER}
+          </if>
+          <if test="student_name != null">
+              AND s.student_name = #{student_name,jdbcType=VARCHAR}
+          </if>
+          <if test="email != null">
+              AND s.email = #{email,jdbcType=VARCHAR}
+          </if>
+          <!-- 可以添加更多条件 -->
+          <if test="phoneNumber != null">
+              AND s.phoneNumber = #{phoneNumber,jdbcType=VARCHAR}
+          </if>
+          <if test="progress != null">
+              AND s.progress = #{progress,jdbcType=INTEGER}
+          </if>
+          <if test="gradeAndCertificateID != null">
+              AND g.gradeAndCertificateID = #{gradeAndCertificateID,jdbcType=INTEGER}
+          </if>
+          <if test="certificateURL != null">
+              AND g.certificateURL = #{certificateURL,jdbcType=VARCHAR}
+          </if>
+      </where>
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     SELECT s.student_id, s.student_name, s.email, s.phoneNumber, s.progress,
-           o.learning_id, o.course_id, o.video_url, o.quiz_Results,
-           a.submission_id, a.teacher_id, a.assignment_name, a.submission_date, a.grade, a.submission_content,
-           g.course_id,g.gradeAndCertificateID, g.finalGrade, g.certificateURL
+           g.gradeAndCertificateID,g.certificateURL
     FROM students s
-           LEFT JOIN onlinelearning o ON s.student_id = o.student_id
-           LEFT JOIN assignmentsubmissions a ON s.student_id = a.student_id
-           LEFT JOIN gradesandcertificates g ON s.student_id = g.student_id
+             LEFT JOIN student_certificates sc ON s.student_id = sc.student_id
+             LEFT JOIN gradesandcertificates g ON sc.gradeAndCertificateID = g.gradeAndCertificateID
   </select>
-
+    <select id="boolStudent" parameterType="com.qzk.pojo.Students" resultType="com.qzk.pojo.Students">
+        SELECT * FROM students
+        WHERE email = #{email}
+          AND phoneNumber = #{phoneNumber}
+            LIMIT 1
+    </select>
 </mapper>

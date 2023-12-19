@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Students {
+public class Students implements Serializable {
 //    students
     private Integer student_id;
 
@@ -20,5 +22,15 @@ public class Students {
     private String phoneNumber;
 
     private Integer progress;
+
+    private List<Gradesandcertificates> gradesandcertificates;
+
+    public List<Gradesandcertificates> getGradesAndCertificates() {
+        return gradesandcertificates;
+    }
+
+    public void setGradesAndCertificates(List<Gradesandcertificates> gradesAndCertificates) {
+        this.gradesandcertificates = gradesAndCertificates;
+    }
 
 }

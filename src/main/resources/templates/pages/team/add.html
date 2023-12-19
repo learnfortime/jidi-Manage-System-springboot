@@ -13,52 +13,36 @@
 	</head>
 
 	<body>
-		<h2>学生添加队</h2>
+		<h2>学生添加</h2>
 		<form id="myForm" class="form-horizontal" method="post" action="/team">
 			<div class="form-group">
 				<label class="col-sm-1 control-label"><span>*</span>学生ID</label>
 				<div class="col-sm-9">
-					<input required="required" name="teamName" class="form-control" placeholder="请输入学生ID"/>
+					<input required="required" name="student_id" class="form-control" placeholder="请输入学生ID"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-1 control-label"><span>*</span>中文名称</label>
 				<div class="col-sm-9">
-					<input required="" name="chineseName" class="form-control" placeholder="请输入学生中文名称"/>
+					<input required="" name="student_name" class="form-control" placeholder="请输入学生中文名称"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-1 control-label">email</label>
 				<div class="col-sm-9">
-					<input name="coach" class="form-control" placeholder="请输入学生email"/>
+					<input name="email" class="form-control" placeholder="请输入学生email"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-1 control-label">电话号码</label>
 				<div class="col-sm-9">
-					<input name="stadium" class="form-control" placeholder="请输入学生电话号码"/>
+					<input name="phoneNumber" class="form-control" placeholder="请输入学生电话号码"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-1 control-label">学习进度</label>
 				<div class="col-sm-9">
-					<input name="location" class="form-control" placeholder="学习进度默认0"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-1 control-label">成立时间</label>
-				<div class="col-sm-2">
-					<input name="createTime" class="form-control" type="date"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-1 control-label">所属联盟</label>
-				<div class="col-sm-2">
-					<select name="area" class="form-control">
-         				<option value="-1">请选择所属联盟</option>
-         				<option value="0">东部联盟</option>
-         				<option value="1">西部联盟</option>
-			      	</select>
+					<input name="progress" class="form-control" placeholder="学习进度默认0"/>
 				</div>
 			</div>
 			<div class="form-group">
@@ -77,9 +61,15 @@
 		$("#btnAdd").click(function () {
 			$.ajax({
 				type: "POST",
-				url: "/team/",
+				url: "/student/insert/",
 				data: $("#myForm").serialize(),
 				dataType:"json",
+				//所以ajax请求都要加上token，也就是一下代码
+				beforeSend: function(xhr) {
+					// 在发送请求之前设置 Authorization 头部
+					var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+					xhr.setRequestHeader("Authorization", "Bearer " + token);
+				},
 				success: function(vo){
 					if(vo.code==200) {
 						window.location.href = "/pages/team/list.html";

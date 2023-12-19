@@ -1,8 +1,11 @@
 package com.qzk.dao;
 
 import com.qzk.pojo.Gradesandcertificates;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.List;
 
+@Mapper
 public interface GradesandcertificatesMapper {
     int deleteByPrimaryKey(Integer gradeAndCertificateID);
 

@@ -5,6 +5,7 @@
 		<title>球队列表</title>
 		<script type="text/javascript" src="/js/jquery-1.11.1.js"></script>
     	<script type="text/javascript" src="/js/bootstrap.js" ></script>
+		<script type="text/javascript" src="list.js"></script>
     	<link  rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
     	<link  rel="stylesheet" type="text/css" href="/css/style.css"></link>
 		<style>
@@ -12,59 +13,181 @@
 				color: #1EABFF;
 				padding: 0 5px;
 			}
+			/* 模态框（background） */
+			.modal {
+				display: none; /* 隐藏模态框 */
+				position: fixed; /* 保持在页面顶部 */
+				z-index: 1; /* 位于顶层 */
+				left: 0;
+				top: 0;
+				width: 100%; /* 全宽 */
+				height: 100%; /* 全高 */
+				overflow: auto; /* 启用滚动 */
+				background-color: rgb(0,0,0); /* 背景颜色 */
+				background-color: rgba(0,0,0,0.4); /* 背景颜色，带有透明度 */
+			}
+
+			/* 模态框内容 */
+			.modal-content {
+				background-color: #fefefe;
+				margin: 15% auto; /* 15% 从顶部和水平居中 */
+				padding: 20px;
+				border: 1px solid #888;
+				width: 80%; /* 可以调整宽度 */
+			}
+
+			/* 关闭按钮 */
+			.close {
+				color: #aaa;
+				float: right;
+				font-size: 28px;
+				font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: black;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body>
-		<form id="myForm" class="form-horizontal">
-			<h2>NBA球队列表</h2>
-			<div class="searchDiv">
-				<button class="btn btn-danger">批量删除</button>
-				<a href="/pages/team/add.html" class="btn btn-success">添加</a>
-				球队名称:<input name="teamName" placeholder="英文名称"/>
-				中文名称:<input name="chineseName" placeholder="中文名称"/>
-				教练:<input name="coach" placeholder="教练姓名"/>
-				创建时间:<input name="beginDate" type="date"/>-<input name="endDate" type="date"/>
-				所属联盟:<select name="area">
-					<option value="-1">请选择联盟</option>
-					<option value="0">东部联盟</option>
-					<option value="1">西部联盟</option>
-				</select>
-				<button type="button" onclick="loadData()" class="btn btn-info">查询</button>
-				<button type="reset" class="btn btn-warning">重置</button>
+	<!-- 弹出框 -->
+	<div id="confirmBox" style="display: none; position: fixed; left: 50%; top: 40%; transform: translate(-50%, -40%); width: 60%; height: 90%; border: 1px solid black; padding: 20px; background-color: white; z-index: 100; overflow: auto;">
+	<!-- 弹出框内容 -->
+		<h2>学生修改</h2>
+		<form id="myForm1" class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-1 control-label"><span>*</span>学生ID</label>
+				<div class="col-sm-9">
+					<input required="required" name="student_id_update" class="form-control" />
+				</div>
 			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label"><span>*</span>学生姓名</label>
+				<div class="col-sm-9">
+					<input required="" name="student_name_update" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">email</label>
+				<div class="col-sm-9">
+					<input name="email_update" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">电话号码</label>
+				<div class="col-sm-9">
+					<input name="phoneNumber_update" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">完成进度</label>
+				<div class="col-sm-9">
+					<input name="progress_update" class="form-control" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label">获奖证书</label>
+				<div class="col-sm-2">
+					<select name="GradeAndCertificateID_update" class="form-control">
+						<option></option>
+						<option value="1">国家奖学金</option>
+						<option value="2">ARM证书</option>
+						<option value="3">蓝桥杯证书</option>
+						<option value="4">创业创新证书</option>
+						<option value="5">华为网络证书</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-1 control-label"></label>
+				<div class="col-sm-9">
+					<button id="confirmYes" type="submit" class="btn btn-sm btn-info">提&nbsp;交</button>
+					<button type="reset"  class="btn btn-sm btn-warning">重&nbsp;置</button>
+					<button id="confirmNo" class="btn btn-sm btn-default">退出</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div id="myModal" class="modal">
+		<!-- 模态内容 -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<form id="certificateForm">
+				<label for="certificateSelect">选择证书:</label>
+				<select id="certificateSelect" name="gradeAndCertificateID">
+					<option></option>
+					<option value="1">国家奖学金</option>
+					<option value="2">ARM证书</option>
+					<option value="3">蓝桥杯证书</option>
+					<option value="4">创业创新证书</option>
+					<option value="5">华为网络证书</option>
+					<!-- 证书选项将在这里 -->
+				</select>
+				<br><br>
+				<button type="submit" class="btn btn-primary">提交</button>
+			</form>
+		</div>
+	</div>
+		<form id="myForm" class="form-horizontal">
+			<h2>基地培训学生列表</h2>
+			<div class="searchDiv">
+<!--				<a href="/pages/team/add.html" class="btn btn-success">添加</a>-->
+				学生ID:<input name="student_id" placeholder="请输入学生ID"/>
+				学生姓名:<input name="student_name" placeholder="中文名称"/>
+				邮箱:<input name="email" placeholder="邮箱号码..."/>
+<!--				电话号码:<input name="beginDate" type="date"/>-<input name="endDate" type="date"/>-->
+				电话号码:<input name="phoneNumber" placeholder="请输入电话号码" type="text"/>
+				获奖证书:<select name="gradeAndCertificateID1">
+					<option></option>
+					<option value="1">国家奖学金</option>
+					<option value="2">ARM证书</option>
+					<option value="3">蓝桥杯证书</option>
+					<option value="4">创业创新证书</option>
+					<option value="5">华为网络证书</option>
+				</select>
+				<button type="button" onclick="selectData()" class="btn btn-info">查询</button>
+				<button type="reset" class="btn btn-warning">重置</button>
+				<a href="/pages/team/add.html" class="btn btn-success">添加</a>
+			</div>
+<!--			student_id,student_name,email,phoneNumber,GradeAndCertificateID-->
 			<table class="table table-bordered table-striped">
 				<thead>
-					<tr>
-						<th>全选<input type="checkbox" id="all"/></th>
-						<th>球队ID</th>
-						<th>球队logo</th>
-						<th>球队名称</th>
-						<th>中文名称</th>
-						<th>主教练</th>
-						<th>主场馆</th>
-						<th>所属地区</th>
-						<th>成立时间</th>
-						<th>所属联盟</th>
-						<th>操作</th>
-					</tr>
+				<tr>
+					<!--						<th>全选<input type="checkbox" id="all"/></th>-->
+					<th>学生ID</th>
+					<th>学生姓名</th>
+					<th>email</th>
+					<th>电话号码</th>
+					<th>完成进度</th>
+					<th>证书ID</th>
+					<th>获奖证书</th>
+					<!--						<th>所属地区</th>-->
+					<!--						<th>成立时间</th>-->
+					<!--						<th>所属联盟</th>-->
+					<th>操作</th>
+				</tr>
 				</thead>
 				<tbody id="tboby">
-					<tr>
-						<td><input type="checkbox" name="one"/></td>
-						<td>1001</td>
-						<td><img  src="/img/logo/rect/20.jpg"/></td>
-						<td>76ers</td>
-						<td>76人</td>
-						<td>道格-里弗斯</td>
-						<td>富国银行中心</td>
-						<td>宾夕法尼亚州费城</td>
-						<td>1967-1-1</td>
-						<td>东部联盟</td>
-						<td>
-							<button class="btn btn-sm btn-danger">删除</button>
-							<button class="btn btn-sm btn-info">更新</button>
-						</td>
-					</tr>
+				<tr>
+					<!--						<td><input type="checkbox" name="one"/></td>-->
+					<td>1</td>
+					<!--						<td><img  src="/img/logo/rect/20.jpg"/></td>-->
+					<
+					<td>zhangsan</td>
+					<td>1987542@qq.com</td>
+					<td>159774991</td>
+					<td>50</td>
+					<td>国家奖学金</td>
+					<!--						<td>1967-1-1</td>-->
+					<!--						<td>东部联盟</td>-->
+					<td>
+						<button class="btn btn-sm btn-danger">删除</button>
+						<button class="btn btn-sm btn-info">更新</button>
+					</td>
+				</tr>
 				</tbody>
 			</table>
 			<!--分页部分-->
@@ -100,6 +223,7 @@
 				<label class="control-label col-sm-1" style="text-align: left">页</label>
 			</div>
 		</form>
+
 	</body>
 
 </html>
@@ -118,7 +242,7 @@
 	//填充分页信息
 	function fillPageData(pageInfo) {
 		//填充信息
-		$("#total").html(pageInfo.total);
+		$("#total").html(pageInfo.size);
 		$("#pages").html(pageInfo.pages);
 		$("input[name='pageNum']").val(pageInfo.pageNum);
 		$("select[name='pageSize']").val(pageInfo.pageSize);
@@ -140,20 +264,39 @@
 			$("#lastPage").addClass("disabled");
 		}
 	}
-	//更新按钮
-	function updateTeam(id) {
-		let pageNum=$("input[name='pageNum']").val();
-		let pageSize=$("select[name='pageSize']").val();
-		window.location.href="/pages/team/update.html?teamId="+id+"&pageNum="+pageNum+"&pageSize="+pageSize;
-	}
-	//删除按钮
-	function deleteTeam(id) {
-		if(confirm("确定要删除吗?")) {
-			//发起异步请求
+
+	window.onload = function() {
+		// 获取按钮元素
+		var confirmYesButton = document.getElementById('confirmYes');
+		var confirmNoButton = document.getElementById('confirmNo');
+
+		// 为 "是" 按钮添加事件监听器
+		confirmYesButton.addEventListener('click', function() {
+			let student_id_update = $('[name="student_id_update"]').val()
+			let student_name_update = $('[name="student_name_update"]').val()
+			let email_update = $('[name="email_update"]').val()
+			let phoneNumber_update = $('[name="phoneNumber_update"]').val()
+			let progress_update = $('[name="progress_update"]').val()
+
+			document.getElementById('confirmBox').style.display = 'none';
+			// 发起ajax请求
 			$.ajax({
-				type: "POST",
-				url: "/team/" + id, //RESTful风格的API定义
-				data: "_method=DELETE",
+				type: "PUT",
+				url: "/student/update/", //RESTful风格的API定义
+				dataType:"json",
+				data: {
+					student_id : student_id_update,
+					student_name:student_name_update,
+					email : email_update,
+					phoneNumber : phoneNumber_update,
+					progress : progress_update
+				},
+				//所以ajax请求都要加上token，也就是一下代码
+				beforeSend: function(xhr) {
+					// 在发送请求之前设置 Authorization 头部
+					var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+					xhr.setRequestHeader("Authorization", "Bearer " + token);
+				},
 				success: function (vo) {
 					if(vo.code==200){
 						loadData();
@@ -162,18 +305,202 @@
 					}
 				}
 			});
+
+		});
+
+		// 为 "否" 按钮添加事件监听器
+		confirmNoButton.addEventListener('click', function() {
+			document.getElementById('confirmBox').style.display = 'none';
+		});
+	};
+
+	function updateTeam(student_id_update,student_name_update,email_update,process_update,gradeAndCertificateID_update,certificateURL_update) {
+		//显示弹出框
+		let confirmBox = document.getElementById('confirmBox');
+		confirmBox.style.display = 'block';
+		// 获取名为 'student_id' 的输入字段
+		let studentIdInput = document.getElementsByName('student_id_update')[0];
+		let studentIdInput1 = document.getElementsByName('student_name_update')[0];
+		let studentIdInput2 = document.getElementsByName('email_update')[0];
+		let studentIdInput3 = document.getElementsByName('process_update')[0];
+		let studentIdInput4 = document.getElementsByName('gradeAndCertificateID_update')[0];
+		let studentIdInput5 = document.getElementsByName('certificateURL_update')[0];
+		studentIdInput.value = student_id_update;
+		studentIdInput1.value = student_name_update;
+		studentIdInput2.value = email_update;
+		studentIdInput3.value = process_update;
+		studentIdInput4.value = gradeAndCertificateID_update;
+		studentIdInput5.value = certificateURL_update;
+	}
+
+	//删除按钮
+	function deleteTeam(student_id) {
+		if(confirm("确定要删除吗?")) {
+			//发起异步请求
+			$.ajax({
+				type: "DELETE",
+				url: "/student/delete/" + student_id, //RESTful风格的API定义
+				dataType:"json",
+				// data: "_method=DELETE",
+				//所以ajax请求都要加上token，也就是一下代码
+				beforeSend: function(xhr) {
+					// 在发送请求之前设置 Authorization 头部
+					var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+					xhr.setRequestHeader("Authorization", "Bearer " + token);
+				},
+				success: function (vo) {
+					if(vo.code==200){
+						loadData();
+					}else{
+						alert("删除失败！"+vo.msg);
+					}
+				}
+			});
+			loadData();
 		}
 	}
-	//上传图片按钮
-	function uploadLogo(id) {
-		let pageNum=$("input[name='pageNum']").val();
-		let pageSize=$("select[name='pageSize']").val();
-		window.location.href="/pages/team/uploadLogo.html?teamId="+id+"&pageNum="+pageNum+"&pageSize="+pageSize;
+	var modal = document.getElementById("myModal");
+
+	// 获取 <span> 元素，用于关闭模态框
+	var span = document.getElementsByClassName("close")[0];
+	function addTeam(student_id){
+		// 这里可以填充证书选项
+		// 例如：document.getElementById("certificateSelect").innerHTML = '<option value="1">证书1</option>';
+		modal.style.display = "block";
+
+		// 当用户点击 <span> (x), 关闭模态框
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+		// 当用户点击模态框以外的地方，关闭它
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+			// 处理表单提交
+			document.getElementById("certificateForm").onsubmit = function(event) {
+				event.preventDefault();
+				// 提交处理逻辑
+				var gradeAndCertificateID = document.getElementById("certificateSelect").value;
+				console.log("Selected certificate: " + gradeAndCertificateID);
+				// 发送ajax请求
+				$.ajax({
+					url: '/student/insertCertificate/',
+					type: 'POST',  // or 'GET', depending on your server setup
+					data: {
+						student_id: student_id,
+						gradeAndCertificateID: gradeAndCertificateID
+					},
+					beforeSend: function(xhr) {
+						// 在发送请求之前设置 Authorization 头部
+						var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+						xhr.setRequestHeader("Authorization", "Bearer " + token);
+					},
+					success: function(vo) {
+						if (vo.code==200){
+							alert("证书添加成功")
+							loadData();
+						}
+					},
+					error: function(xhr, status, error) {
+						// This function is called when the request fails
+						console.log('Error:', error);
+						alert('你所添加的证书已存在')
+					}
+				});
+			}
+		}
 	}
+
+
 	String.prototype.GetValue= function(para) {
 		let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
 		let r = this.substr(this.indexOf("\?")+1).match(reg);
 		if (r!=null) return unescape(r[2]); return null;
+	}
+	//查询数据
+	function selectData() {
+		event.preventDefault()
+		// First, gather the data from the form
+
+		let student_id = $('[name="student_id"]').val()
+		let progress = $('[name="progress"]').val()
+		let gradeAndCertificateID= $('[name="gradeAndCertificateID1"]').val()
+		// let certificateURL = $.val();
+		let student_name = document.querySelector('[name="student_name"]').value;
+		let email = document.querySelector('[name="email"]').value;
+		let phoneNumber = document.querySelector('[name="phoneNumber"]').value;
+		$.ajax({
+			url: '/student/select/',
+			type: 'POST',  // or 'GET', depending on your server setup
+			data: {
+				student_id: student_id,
+				student_name: student_name,
+				email: email,
+				phoneNumber: phoneNumber,
+				progress: progress, // Added this line
+				gradeAndCertificateID: gradeAndCertificateID
+			},
+			// contentType: "application/json",
+			// contentType: 'application/form-data; charset=UTF-8',
+			// dataType:"json", // or another datatype if your server responds with something else
+			beforeSend: function(xhr) {
+				// 在发送请求之前设置 Authorization 头部
+				var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+				xhr.setRequestHeader("Authorization", "Bearer " + token);
+			},
+			success: function(vo) {
+				// This function is called when the request is successful
+				// 'response' contains the data returned from the server
+				let list=vo.pageInfo.list;
+				let str="";
+				for(let i=0;i<list.length;i++){
+					let obj=list[i];
+					let student_id=obj.student_id;
+					// let teamLogo=obj.teamLogo==null?'':'<img width="80%" height="30%"  src="/img/uploadFile/'+obj.teamLogo+'">';
+					let student_name=obj.student_name==null?'':obj.student_name;
+					let email=obj.email==null?'':obj.email;
+					let phoneNumber=obj.phoneNumber==null?'':obj.phoneNumber;
+					let progress=obj.progress==null?'':obj.progress;
+					let gradeAndCertificateID=""
+					let certificateURL = "";
+					let gradesAndCertificates = obj.gradesAndCertificates || []; // Default to an empty array if null
+					for (let j = 0; j < gradesAndCertificates.length; j++) {
+						let gradeAndCertificate = gradesAndCertificates[j];
+						gradeAndCertificateID += " " + gradeAndCertificate.gradeAndCertificateID || '';
+						certificateURL += " "+gradeAndCertificate.certificateURL || '';
+						// Add your logic here to use gradeAndCertificateID and certificateURL
+						// For example, appending them to 'str' or processing them otherwise
+					}
+					let btnStr="";
+					if(student_id!=null){
+						btnStr='<button type="button" name="deleteBtn" class="btn btn-sm btn-danger" onclick="deleteTeam('+student_id+')">删除</button>&nbsp;' +
+								'<button type="button" name="updateBtn" class="btn btn-sm btn-info" onclick="updateTeam('+student_id+', '+student_name+', '+email+', '+phoneNumber+', '+progress+', '+gradeAndCertificateID+', '+certificateURL+')">更新</button>&nbsp;'
+						// '<button type="button" name="uploadBtn" class="btn btn-sm btn-info" onclick="uploadLogo('+teamId+')">上传图片</button>';
+					}else{
+						btnStr='<button name="deleteBtn" class="btn btn-sm btn-danger disabled">已删除</button>';
+					}
+					str+='<tr>' +
+							// '            <td><input type="checkbox"/></td>' +
+							'            <td>'+student_id+'</td>' +
+							'            <td>'+student_name+'</td>' +
+							'            <td>'+email+'</td>' +
+							'            <td>'+phoneNumber+'</td>' +
+							'            <td>'+progress+'</td>' +
+							'            <td>'+gradeAndCertificateID+'</td>' +
+							'            <td>'+certificateURL+'</td>\n' +
+							'             <td>'+btnStr+'</td>' +
+							'</tr>'
+				}
+				$("#tboby").html(str);
+				//填充分页数据
+				fillPageData(vo.pageInfo);
+			},
+			error: function(xhr, status, error) {
+				// This function is called when the request fails
+				console.log('Error:', error);
+			}
+		});
 	}
 	//加载数据
 	function loadData(){
@@ -186,48 +513,55 @@
 		if(pageSize!=null&&$("select[name='pageSize']").val()!=null){
 			$("select[name='pageSize']").val(pageSize);
 		}
-		//alert($("#myForm").serialize())
 		$.ajax({
 			type: "GET",
-			url: "/team/list",
+			url: "/student/list/",
 			data: $("#myForm").serialize(),//主要是分页和多条件参数数据
 			dataType:"json",
+			//所以ajax请求都要加上token，也就是一下代码
+			beforeSend: function(xhr) {
+				// 在发送请求之前设置 Authorization 头部
+				var token = window.localStorage.getItem("token"); // 假设令牌存储在浏览器的本地存储中
+				xhr.setRequestHeader("Authorization", "Bearer " + token);
+			},
 			success: function(vo){
-				//alert( "Data Saved: " + vo );
 				let list=vo.pageInfo.list;
 				let str="";
 				for(let i=0;i<list.length;i++){
 					let obj=list[i];
-					let teamId=obj.teamId;
-					let teamLogo=obj.teamLogo==null?'':'<img width="80%" height="30%"  src="/img/uploadFile/'+obj.teamLogo+'">';
-					let teamName=obj.teamName==null?'':obj.teamName;
-					let chineseName=obj.chineseName==null?'':obj.chineseName;
-					let coach=obj.coach==null?'':obj.coach;
-					let stadium=obj.stadium==null?'':obj.stadium;
-					let location=obj.location==null?'':obj.location;
-					let time=obj.createTime==null?'':obj.createTime.split('-')[0];
-					let area=obj.area=='0'?"东部联盟":"西部联盟";
-					let isDel=obj.isDel;
+					let student_id=obj.student_id;
+					// let teamLogo=obj.teamLogo==null?'':'<img width="80%" height="30%"  src="/img/uploadFile/'+obj.teamLogo+'">';
+					let student_name=obj.student_name==null?'':obj.student_name;
+					let email=obj.email==null?'':obj.email;
+					let phoneNumber=obj.phoneNumber==null?'':obj.phoneNumber;
+					let progress=obj.progress==null?'':obj.progress;
+					let gradeAndCertificateID=""
+					let certificateURL = "";
+					let gradesAndCertificates = obj.gradesAndCertificates || []; // Default to an empty array if null
+					for (let j = 0; j < gradesAndCertificates.length; j++) {
+						let gradeAndCertificate = gradesAndCertificates[j];
+						gradeAndCertificateID += " " + gradeAndCertificate.gradeAndCertificateID || '';
+						certificateURL += " "+gradeAndCertificate.certificateURL || '';
+					}
 					let btnStr="";
-					if(isDel==0){
-						btnStr='<button type="button" name="deleteBtn" class="btn btn-sm btn-danger" onclick="deleteTeam('+teamId+')">删除</button>&nbsp;' +
-								'<button type="button" name="updateBtn" class="btn btn-sm btn-info" onclick="updateTeam('+teamId+')">更新</button>&nbsp;'+
-								'<button type="button" name="uploadBtn" class="btn btn-sm btn-info" onclick="uploadLogo('+teamId+')">上传图片</button>';
+					if(student_id!=null){
+						btnStr='<button type="button" name="deleteBtn" class="btn btn-sm btn-danger" onclick="deleteTeam('+student_id+')">删除</button>&nbsp;' +
+								'<button type="button" name="updateBtn" class="btn btn-sm btn-info" onclick="updateTeam('+student_id+')">更新</button>&nbsp;' +
+								'<button type="button" name="addBtn" class="btn btn-sm btn-warning" onclick="addTeam('+student_id+')">添加证书</button>&nbsp;'
+								// '<button type="button" name="uploadBtn" class="btn btn-sm btn-info" onclick="uploadLogo('+teamId+')">上传图片</button>';
 					}else{
 						btnStr='<button name="deleteBtn" class="btn btn-sm btn-danger disabled">已删除</button>';
 					}
 					str+='<tr>' +
-							'            <td><input type="checkbox"/></td>' +
-							'            <td>'+teamId+'</td>' +
-							'            <td>'+teamLogo+'</td>' +
-							'            <td>'+teamName+'</td>' +
-							'            <td>'+chineseName+'</td>' +
-							'            <td>'+coach+'</td>' +
-							'            <td>'+stadium+'</td>' +
-							'            <td>'+location+'</td>' +
-							'            <td>'+time+'</td>\n' +
-							'            <td>'+area+'</td>\n' +
-							'            <td>'+btnStr+'</td>' +
+							// '            <td><input type="checkbox"/></td>' +
+							'            <td>'+student_id+'</td>' +
+							'            <td>'+student_name+'</td>' +
+							'            <td>'+email+'</td>' +
+							'            <td>'+phoneNumber+'</td>' +
+							'            <td>'+progress+'</td>' +
+							'            <td>'+gradeAndCertificateID+'</td>' +
+							'            <td>'+certificateURL+'</td>\n' +
+							'             <td>'+btnStr+'</td>' +
 							'</tr>'
 				}
 				$("#tboby").html(str);

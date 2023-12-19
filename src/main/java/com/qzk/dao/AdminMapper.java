@@ -6,6 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AdminMapper {
     //判断Admin
-
-    int boolAdmin(Admin admin);
+    Admin boolAdmin(Admin admin);
 }

@@ -2,6 +2,7 @@ package com.qzk.server;
 
 import com.qzk.dao.CoursesMapper;
 import com.qzk.pojo.Courses;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,6 +25,7 @@ public class CourseServer {
         return coursesMapper.selectByPrimaryKey(id);
     }
 
+    @Cacheable(value = "coursesCache", key = "'allCourses'")
     public List<Courses> selectAll(){
         return coursesMapper.selectAll();
     }
