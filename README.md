@@ -15,4 +15,3 @@ A jidi manage system is base in springboot project
           2)layui模型
           3)数据分析工具
 
-![Uploading image.png…]()
