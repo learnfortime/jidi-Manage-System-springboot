@@ -1,4 +1,4 @@
-# jidi-Manage-System-springboot
+![image](https://github.com/learnfortime/jidi-Manage-System-springboot/assets/119491153/af28ff8e-ddef-4ffd-a7d2-aa9b7c58fea5)# jidi-Manage-System-springboot
 A jidi manage system is base in springboot project
 
 1.这是一个给予springboot 的系统管理的项目
@@ -14,3 +14,5 @@ A jidi manage system is base in springboot project
           1)ajax请求、fetch请求
           2)layui模型
           3)数据分析工具
+
+![Uploading image.png…]()
